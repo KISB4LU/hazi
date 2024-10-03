@@ -6,6 +6,7 @@ import org.example.HistoricalData;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -75,12 +76,30 @@ public class Graph extends JPanel {
                 max = c.high();
             }
         }
+        //g.drawLine(50, 25, 50, 75);
+        double Ydiff = height/(max-min);
+        double x = 0;
+        double Xdiff = width/stock.length;
+        for(Chart c : stock){
+            if(c.open()<c.close()){
+                g.setColor(Color.GREEN);
+            }
+            if(c.open()>c.close()){
+                g.setColor(Color.RED);
+            }
+            double axis = x+Xdiff/2;
+            double Ylow = (c.low()-min)*Ydiff;
+            double Yhigh = (c.high()-min)*Ydiff;
+            System.out.println("axis: " + axis + " Ylow: " + Ylow + " Yhigh: " + Yhigh);
+            g.draw(new Line2D.Double(axis,height-Ylow,axis,height-Yhigh));
+            x += Xdiff;
+        }
         return image;
     }
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(LineGraph(), 0, 0, null);
+        g2d.drawImage(Candlestick(), 0, 0, null);
     }
 }
