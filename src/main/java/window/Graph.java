@@ -9,22 +9,30 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
+enum GraphType{
+    LINE,
+    CANDLE
+}
 public class Graph extends JPanel {
     /*private BufferedImage image;
     Chart(){
         image = new BufferedImage(200,100,BufferedImage.TYPE_INT_RGB);
     }*/
-    private int width = 600;
-    private int height = 400;
-    private BufferedImage LineGraph(){
-        BufferedImage image = new BufferedImage(width, height,BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
+    private int width = 800;
+    private int height = 600;
+    private GraphType type = GraphType.LINE;
+    private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+    public Graph() {
+        DrawGraph();
+    }
+    private void LineGraph(Graphics2D g){
         //g.drawLine(0,10,50,50);
+        g.setColor(Color.BLUE);
         HistoricalData hd = new HistoricalData();
         Chart stock[] = null;
         try {
-            stock = hd.GetChart("AAPL","5Min","1000","iex");
+            stock = hd.GetChart("AAPL","5Min","1000","sip");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -39,7 +47,7 @@ public class Graph extends JPanel {
                 max = stock[i].close();
             }
         }
-        double Xdiff =width/stock.length;
+        double Xdiff = (double) width /(stock.length);
         double x0 = 0;
         double x1 = Xdiff;
         double Ydiff = height/(max-min);
@@ -53,16 +61,16 @@ public class Graph extends JPanel {
             x1 += Xdiff;
                 System.out.println(i+". Date: " + stock[i].date() + " close: " + stock[i].close());
         }
-        return image;
     }
-    private BufferedImage Candlestick (){
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
+    private void Candlestick (Graphics2D g){
         HistoricalData hd = new HistoricalData();
 
         Chart stock[] = null;
         try {
-            stock = hd.GetChart("AAPL","5Min","1000","iex");
+            stock = hd.GetChart("AAPL","10Min","1000","sip");
+            for(Chart c: stock){
+                System.out.println("Date: "+c.date()+ " close: "+ c.close());
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -79,13 +87,23 @@ public class Graph extends JPanel {
         //g.drawLine(50, 25, 50, 75);
         double Ydiff = height/(max-min);
         double x = 0;
-        double Xdiff = width/stock.length;
+        double Xdiff = (double) width /(stock.length-1);
+        //g.drawRect(0, 0, 50, 50);
         for(Chart c : stock){
+            double Y;
+            double CandleWidth = Xdiff-2;//candletick width
+            double CandleHeight;
             if(c.open()<c.close()){
                 g.setColor(Color.GREEN);
+                Y = (c.close()-min)*Ydiff;
+                CandleHeight = Y - (c.open()-min)*Ydiff;
+                g.fill(new Rectangle2D.Double(x+1,height - Y,CandleWidth,CandleHeight));
             }
             if(c.open()>c.close()){
                 g.setColor(Color.RED);
+                Y = (c.open()-min)*Ydiff;
+                CandleHeight = Y - (c.close()-min)*Ydiff;
+                g.fill(new Rectangle2D.Double(x+1,height - Y,CandleWidth,CandleHeight));
             }
             double axis = x+Xdiff/2;
             double Ylow = (c.low()-min)*Ydiff;
@@ -94,12 +112,41 @@ public class Graph extends JPanel {
             g.draw(new Line2D.Double(axis,height-Ylow,axis,height-Yhigh));
             x += Xdiff;
         }
-        return image;
+    }
+
+    private void DrawGraph() {
+        Graphics2D g = image.createGraphics();
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, 0, width, height);
+
+        switch (type) {
+            case LINE:
+                LineGraph(g);
+                break;
+            case CANDLE:
+                Candlestick(g);
+                break;
+        }
+        g.dispose();
+        repaint();
+    }
+    public void setType(GraphType type){
+        this.type = type;
+        DrawGraph();
     }
     @Override
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(Candlestick(), 0, 0, null);
+        g2d.drawImage(image, 0, 0, null);
+        /*switch(type){
+            case LINE:
+                g2d.drawImage(LineGraph(), 0, 0, null);
+                break;
+            case CANDLE:
+                g2d.drawImage(Candlestick(), 0, 0, null);
+                break;
+        }*/
+
     }
 }
