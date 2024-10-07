@@ -10,15 +10,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class HistoricalData
 {
-    private String API_KEY = "AKXLECPRBPD4ZTEO98X2";
-    private String API_SECRET = "DkZSAPaoWPk1MpDgmZ2hfdAjjviCosOOSYQVIxPt";
-    public String GetData(String symbol, String timeframe, String limit ,String feed) throws IOException {
+    private String API_KEY = "PKRCBG5UH107R9QUT41V";
+    private String API_SECRET = "pK10CZABYWE5HTppdLFiqHcSev9qNUomW2CrY66g";
+
+    public String GetData(String symbol, String timeframe, String start, String end ,String feed) throws IOException {
         OkHttpClient client = new OkHttpClient();
 
-        String url = String.format("https://data.alpaca.markets/v2/stocks/bars?symbols=%s&timeframe=%s&limit=%s&adjustment=raw&feed=%s&sort=asc", symbol, timeframe,limit, feed);
-
+        //String url = String.format("https://data.alpaca.markets/v2/stocks/bars?symbols=%s&timeframe=%s&limit=%s&adjustment=raw&feed=%s&sort=asc", symbol, timeframe,limit, feed);
+        String url2 = String.format("https://data.alpaca.markets/v2/stocks/bars?symbols=%s&timeframe=%s&start=%s&end=%s&adjustment=raw&feed=iex&sort=asc",symbol,timeframe,start,end);
         Request request = new Request.Builder()
-                .url(url)//"https://data.alpaca.markets/v2/stocks/bars?symbols=AAPL&timeframe=1Min&limit=1000&adjustment=raw&feed=sip&sort=asc")
+                .url(url2)//"https://data.alpaca.markets/v2/stocks/bars?symbols=AAPL&timeframe=1Min&limit=1000&adjustment=raw&feed=sip&sort=asc")
                 .get()
                 .addHeader("accept", "application/json")
                 .addHeader("APCA-API-KEY-ID", API_KEY)
@@ -38,8 +39,14 @@ public class HistoricalData
             return response.body().string();
         }
     }
-    public Chart[] GetChart(String symbol, String timeframe, String limit ,String feed) throws IOException {
-        String jsonResponse = GetData(symbol, timeframe, limit ,feed);
+    public Chart[] GetChart(String symbol, String timeframe, String start, String end ,String feed) {
+        String jsonResponse = null;
+        try {
+            jsonResponse = GetData(symbol, timeframe, start, end ,feed);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Historical Data"+jsonResponse);
         JsonObject JsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
         JsonObject bars =  JsonObject.get("bars").getAsJsonObject();
         JsonArray charts = bars.get(symbol).getAsJsonArray();
@@ -55,6 +62,42 @@ public class HistoricalData
             String Date = chartObj.get("t").getAsString();
             res[i] = new Chart(Date,open,high,low,close,volume);
             i++;
+        }
+        return res;
+    }
+    public Asset[] GetAsset() throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("https://paper-api.alpaca.markets/v2/assets?status=active&attributes=")
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("APCA-API-KEY-ID", "PKRCBG5UH107R9QUT41V")
+                .addHeader("APCA-API-SECRET-KEY", "pK10CZABYWE5HTppdLFiqHcSev9qNUomW2CrY66g")
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String jsonResponse;
+        try {
+            response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+        }finally {
+            jsonResponse = response.body().string();
+        }
+        JsonArray assets = JsonParser.parseString(jsonResponse).getAsJsonArray();
+        Asset[] res = new Asset[assets.size()];
+        int i = 0;
+        for (JsonElement asset : assets) {
+            JsonObject a = asset.getAsJsonObject();
+            String name = a.get("name").getAsString();
+            String symbol = a.get("symbol").getAsString();
+            //System.out.println("name: "+name + " symbol: "+symbol);
+            Asset NewAsset = new Asset(symbol,name);
+            res[i++] = NewAsset;
+
         }
         return res;
     }

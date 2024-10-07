@@ -22,20 +22,23 @@ public class Graph extends JPanel {
     private int height = 600;
     private GraphType type = GraphType.LINE;
     private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
+    Chart stock[];
     public Graph() {
+        HistoricalData hd = new HistoricalData();
+        stock = hd.GetChart("AAPL","5Min","2024-01-01","2024-01-02","sip");
+
         DrawGraph();
     }
     private void LineGraph(Graphics2D g){
         //g.drawLine(0,10,50,50);
         g.setColor(Color.BLUE);
-        HistoricalData hd = new HistoricalData();
+        /*HistoricalData hd = new HistoricalData();
         Chart stock[] = null;
         try {
-            stock = hd.GetChart("AAPL","5Min","1000","sip");
+            stock = hd.GetChart("AAPL","15Min","1000","iex");
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
         double min = stock[0].close();
         double max = stock[0].close();
@@ -63,17 +66,17 @@ public class Graph extends JPanel {
         }
     }
     private void Candlestick (Graphics2D g){
-        HistoricalData hd = new HistoricalData();
+        /*HistoricalData hd = new HistoricalData();
 
         Chart stock[] = null;
         try {
-            stock = hd.GetChart("AAPL","10Min","1000","sip");
+            stock = hd.GetChart("AAPL","15Min","1000","iex");
             for(Chart c: stock){
                 System.out.println("Date: "+c.date()+ " close: "+ c.close());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         double min = stock[0].low();
         double max = stock[0].high();
         for(Chart c: stock){
@@ -89,7 +92,18 @@ public class Graph extends JPanel {
         double x = 0;
         double Xdiff = (double) width /(stock.length-1);
         //g.drawRect(0, 0, 50, 50);
+        String PrevDate = stock[0].date();
         for(Chart c : stock){
+            String PrevDay[] = PrevDate.split("-");
+            PrevDay = PrevDay[2].split("T");
+            String CurDay[] = c.date().split("-");
+            CurDay = CurDay[2].split("T");
+
+            if(!PrevDay[0].equals(CurDay[0])){
+                g.setColor(Color.white);
+                g.draw(new Line2D.Double(x,0,x,height));
+            }
+            PrevDate = c.date();
             double Y;
             double CandleWidth = Xdiff-2;//candletick width
             double CandleHeight;
@@ -134,19 +148,14 @@ public class Graph extends JPanel {
         this.type = type;
         DrawGraph();
     }
+    public void setStock(Chart[] stock){
+        this.stock = stock;
+        DrawGraph();
+    }
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(image, 0, 0, null);
-        /*switch(type){
-            case LINE:
-                g2d.drawImage(LineGraph(), 0, 0, null);
-                break;
-            case CANDLE:
-                g2d.drawImage(Candlestick(), 0, 0, null);
-                break;
-        }*/
-
     }
 }

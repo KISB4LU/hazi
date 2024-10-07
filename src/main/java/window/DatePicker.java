@@ -3,17 +3,25 @@ package window;
 import javax.swing.*;
 import org.jdatepicker.impl.*;
 
+import java.util.Calendar;
 import java.util.Properties;
 
 public class DatePicker extends JPanel {
-    public DatePicker(String title) {
+    private JDatePickerImpl datePicker;
+    public DatePicker(String title, Calendar Date) {
         UtilDateModel model = new UtilDateModel();
+
+        model.setDate(Date.get(Calendar.YEAR), Date.get(Calendar.MONTH), Date.get(Calendar.DAY_OF_MONTH));
+        model.setSelected(true);
+
         Properties p = new Properties();
         JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-
+        datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
         add(new JLabel(title));
         add(datePicker);
+    }
+    public JDatePickerImpl getDatePicker() {
+        return datePicker;
     }
     public static class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
         private String datePattern = "yyyy-MM-dd";
