@@ -1,5 +1,7 @@
 package window;
 
+import indicators.MovingAvrage;
+import indicators.indicator;
 import org.example.Chart;
 import org.example.HistoricalData;
 
@@ -9,6 +11,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 enum GraphType{
     LINE,
     CANDLE
@@ -18,12 +23,15 @@ public class Graph extends JPanel {
     Chart(){
         image = new BufferedImage(200,100,BufferedImage.TYPE_INT_RGB);
     }*/
+    private List<indicator> indicators;
     private int width = 800;
     private int height = 600;
     private GraphType type = GraphType.LINE;
     private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     Chart stock[];
     public Graph() {
+        indicators = new ArrayList<>();
+        indicators.add(new MovingAvrage(Color.BLUE,9));
         HistoricalData hd = new HistoricalData();
         stock = hd.GetChart("AAPL","5Min","2024-01-01","2024-01-02","sip");
 
@@ -140,6 +148,9 @@ public class Graph extends JPanel {
             case CANDLE:
                 Candlestick(g);
                 break;
+        }
+        for(indicator i: indicators){
+            i.draw(g, stock, width, height);
         }
         g.dispose();
         repaint();

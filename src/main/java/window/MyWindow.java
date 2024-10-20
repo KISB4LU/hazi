@@ -3,7 +3,6 @@ package window;
 import org.example.HistoricalData;
 
 import javax.swing.*;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
 
 public class MyWindow extends JFrame {
@@ -68,6 +67,7 @@ public class MyWindow extends JFrame {
             String endDate = formatDate(menu.getEnd().getModel().getValue());
             graph.setStock(hd.GetChart(watchList.getSymbol(), menu.getTimeFrame(), startDate, endDate, "asd"));
         });
+
 // Helper metódus a dátum formázására
 
     }
