@@ -10,6 +10,7 @@ import java.util.Calendar;
 public class MenuBar extends JPanel {
     private JButton line;
     private JButton candle;
+    private JButton indicators;
     private DatePicker start;
     private DatePicker end;
     private  JComboBox  TimeFrameBox;
@@ -18,6 +19,7 @@ public class MenuBar extends JPanel {
 
         line = new JButton("Line");
         candle = new JButton("Candle");
+        indicators = new JButton("Indicators");
         TimeFrameBox = new JComboBox(TimeFrame);
         Calendar Start = Calendar.getInstance();
         Start.set(Calendar.DAY_OF_MONTH, Start.get(Calendar.DAY_OF_MONTH)-1);
@@ -26,6 +28,7 @@ public class MenuBar extends JPanel {
 
         add(line);
         add(candle);
+        add(indicators);
         add(start);
         add(end);
         add(TimeFrameBox);
@@ -35,6 +38,9 @@ public class MenuBar extends JPanel {
     }
     public JButton getCandle() {
         return candle;
+    }
+    public JButton getIndicators() {
+        return indicators;
     }
     public JDatePickerImpl getStart() {
         return start.getDatePicker();

@@ -34,5 +34,12 @@
             <version>1.3.4</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.ta4j/ta4j-core -->
+        <dependency>
+            <groupId>org.ta4j</groupId>
+            <artifactId>ta4j-core</artifactId>
+            <version>0.17</version>
+        </dependency>
+
     </dependencies>
 </project>

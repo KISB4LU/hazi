@@ -1,89 +1,88 @@
 package indicators;
 
-import org.example.Chart;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BarSeries;
+import org.ta4j.core.indicators.EMAIndicator;
+import org.ta4j.core.indicators.SMAIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.Num;
+
+import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
-import java.util.Arrays;
+import java.text.NumberFormat;
 
 public class MovingAvrage extends indicator {
     Color style;
     int len;
+    private JPanel settings;
+
     public MovingAvrage(Color color, int len) {
         style = color;
         this.len = len;
+        initSettings();
+    }
+    public MovingAvrage() {
+        initSettings();
+    }
+    private void initSettings(){
+        settings = new JPanel();
+
+        JColorChooser cc =  new JColorChooser(style);
+
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        NumberFormatter numberFormatter = new NumberFormatter(format);
+        numberFormatter.setMinimum(0);
+        numberFormatter.setMaximum(Integer.MAX_VALUE);
+        JFormattedTextField length = new JFormattedTextField(numberFormatter);
+        length.setColumns(10);
+
+        settings.add(length);
+        settings.add(cc);
+        settings.setVisible(false);
+
+        length.addActionListener(e -> len = Integer.parseInt(length.getText()));
     }
     @Override
-    public void draw(Graphics2D g, Chart chart[], int width, int height) {
+    public void draw(Graphics2D g, BarSeries stock, int width, int height) {
         System.out.println("Moving Avrage");
         g.setColor(style);
-        double min= chart[0].close(), max = chart[0].close();
-        for(Chart c : chart) {
-            if(min>c.close()) min = c.close();
-            if(max<c.close()) max = c.close();
-        }
-        /*
-        double Ydiff = height / (max - min);
-        int Xdiff = width / (len - 1);
-        double ma[] = new double[chart.length];
-        double sum = 0;
-        for(int i = 0; i < ma.length; i++) {
-            ma[i] = (chart[i].close() - min)*Ydiff;
-            if(i<len && i>0){
-                sum += ma[i];
-                ma[i] = sum/i;
-            }else if(i>0){
-                sum = 0;
-                for(int j = 0; j <len; j++){
-                    sum += ma[i-j];
-                }
-                ma[i] = sum/len;
-            }
-        }
 
-        int x0 = 0;
-        int x1 = Xdiff;
-        for(int i = 0; i < ma.length-1; i++) {
-            System.out.println(ma[i]);
-            int y0 = height - (int)ma[i];
-            int y1 = height - (int)ma[i+1];
-            g.drawLine(x0, y0, x1, y1);
-            x0 += Xdiff;
-            x1 += Xdiff;
-        }*/
-        double ma[] = new double[chart.length];
-        double sum = 0;
-        for(int i = 0; i < len; i++){
-            sum += chart[i].close();
-            if(i >0) ma[i] = sum / (i+1);
-            else ma[i] = sum;
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(stock);
 
-        }
-        //double min = ma[0];
-        //double max = ma[0];
-        for (int i = len; i < chart.length; i++) {
-            sum = 0;
-            for (int j = 0; j < len; j++) {
-                sum += chart[i-j].close();
-            }
-            ma[i] = sum / len;
-            System.out.println(sum);
-            //if(min > ma[i]) min = ma[i];
-            //if(max < ma[i]) max = ma[i];
+
+        SMAIndicator sma = new SMAIndicator(closePrice, len);
+        Num min= stock.getFirstBar().getClosePrice(),
+            max = stock.getFirstBar().getClosePrice();
+        for(Bar bar : stock.getBarData()) {
+            if(min.isGreaterThan(bar.getClosePrice())) min = bar.getClosePrice();
+            if(max.isLessThan(bar.getClosePrice())) max = bar.getClosePrice();
         }
 
         //draving
-        double Xdiff = (double) width/ (ma.length-1);
-        double Ydiff = height/(max-min);
+        double Xdiff = (double) width/ (stock.getBarCount()-1);
+        double Ydiff = height/(max.doubleValue()-min.doubleValue());
         double x0 = 0;
         double x1 = Xdiff;
         System.out.println("min: "+min + " max: "+max);
-        for (int i = 0; i < ma.length-1; i++) {
-            double y0 = height-(ma[i]-min)*Ydiff;
-            double y1 = height-(ma[i+1]-min)*Ydiff;
+        for (int i = 0; i < stock.getBarCount()-1; i++) {
+            double y0 = height- sma.getValue(i).minus(min).doubleValue()*Ydiff;
+            double y1 = height- sma.getValue(i+1).minus(min).doubleValue()*Ydiff;
             g.draw(new Line2D.Double(x0, y0, x1, y1));
-            System.out.println("ma["+i+"]:"+ma[i]+" x0: "+x0+" y0: "+y0+" x1: "+x1+" y1: "+y1);
+            System.out.println("ma["+i+"]:"+sma.getValue(i)+" x0: "+x0+" y0: "+y0+" x1: "+x1+" y1: "+y1);
             x0 += Xdiff;
             x1 += Xdiff;
         }
     }
+    @Override
+    public JPanel getPanel() {
+        return settings;
+    }
+    @Override
+    public String toString() {
+        return "Moving Avrage (" + len + ")";
+    }
+
 }

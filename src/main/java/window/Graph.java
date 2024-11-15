@@ -2,15 +2,17 @@ package window;
 
 import indicators.MovingAvrage;
 import indicators.indicator;
-import org.example.Chart;
 import org.example.HistoricalData;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BarSeries;
+import org.ta4j.core.num.Num;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,15 +25,17 @@ public class Graph extends JPanel {
     Chart(){
         image = new BufferedImage(200,100,BufferedImage.TYPE_INT_RGB);
     }*/
-    private List<indicator> indicators;
+    private ArrayList<indicator> indicators;
     private int width = 800;
     private int height = 600;
     private GraphType type = GraphType.LINE;
     private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    Chart stock[];
+    BarSeries stock;
     public Graph() {
         indicators = new ArrayList<>();
-        indicators.add(new MovingAvrage(Color.BLUE,9));
+        indicators.add(new MovingAvrage(Color.BLUE,25));
+        indicators.add(new MovingAvrage(Color.RED,50));
+        indicators.add(new MovingAvrage(Color.GREEN,100));
         HistoricalData hd = new HistoricalData();
         stock = hd.GetChart("AAPL","5Min","2024-01-01","2024-01-02","sip");
 
@@ -48,29 +52,29 @@ public class Graph extends JPanel {
             throw new RuntimeException(e);
         }*/
 
-        double min = stock[0].close();
-        double max = stock[0].close();
-        for(int i = 0; i<stock.length; i++){
-            if(stock[i].close()<min){
-                min = stock[i].close();
+        double min = stock.getFirstBar().getClosePrice().doubleValue();
+        double max = stock.getFirstBar().getClosePrice().doubleValue();
+        for(Bar bar : stock.getBarData()){
+            if(bar.getClosePrice().doubleValue()<min){
+                min = bar.getClosePrice().doubleValue();
             }
-            if(stock[i].close()>max){
-                max = stock[i].close();
+            if(bar.getClosePrice().doubleValue()>max){
+                max = bar.getClosePrice().doubleValue();
             }
         }
-        double Xdiff = (double) width /(stock.length);
+        double Xdiff = (double) width /(stock.getBarCount());
         double x0 = 0;
         double x1 = Xdiff;
         double Ydiff = height/(max-min);
-        for(int i = 0; i<stock.length-1; i++){
-            double y0 = stock[i].close()-min;
-            double y1 = stock[i+1].close()-min;
+        for(int i = 0; i<stock.getBarCount()-1; i++){
+            double y0 = stock.getBar(i).getClosePrice().doubleValue()-min;
+            double y1 = stock.getBar(i+1).getClosePrice().doubleValue()-min;
             y0 = height - y0*Ydiff;
             y1 = height - y1*Ydiff;
             g.draw(new Line2D.Double(x0,y0,x1,y1));
             x0 += Xdiff;
             x1 += Xdiff;
-                System.out.println(i+". Date: " + stock[i].date() + " close: " + stock[i].close());
+                System.out.println(i+". Date: " + stock.getBar(i).getEndTime() + " close: " + stock.getBar(i).getClosePrice());
         }
     }
     private void Candlestick (Graphics2D g){
@@ -85,51 +89,46 @@ public class Graph extends JPanel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }*/
-        double min = stock[0].low();
-        double max = stock[0].high();
-        for(Chart c: stock){
-            if(c.low()<min){
-                min = c.low();
+        double min = stock.getFirstBar().getClosePrice().doubleValue();
+        double max = stock.getFirstBar().getClosePrice().doubleValue();
+        for(Bar bar : stock.getBarData()){
+            if(bar.getClosePrice().doubleValue()<min){
+                min = bar.getClosePrice().doubleValue();
             }
-            if(c.high()>max){
-                max = c.high();
+            if(bar.getClosePrice().doubleValue()>max){
+                max = bar.getClosePrice().doubleValue();
             }
         }
         //g.drawLine(50, 25, 50, 75);
         double Ydiff = height/(max-min);
         double x = 0;
-        double Xdiff = (double) width /(stock.length-1);
+        double Xdiff = (double) width /(stock.getBarCount()-1);
         //g.drawRect(0, 0, 50, 50);
-        String PrevDate = stock[0].date();
-        for(Chart c : stock){
-            String PrevDay[] = PrevDate.split("-");
-            PrevDay = PrevDay[2].split("T");
-            String CurDay[] = c.date().split("-");
-            CurDay = CurDay[2].split("T");
-
-            if(!PrevDay[0].equals(CurDay[0])){
+        ZonedDateTime PrevDate = stock.getFirstBar().getEndTime();
+        for(Bar bars : stock.getBarData()){
+            if(bars.getEndTime().getDayOfYear() != PrevDate.getDayOfYear()){
                 g.setColor(Color.white);
                 g.draw(new Line2D.Double(x,0,x,height));
             }
-            PrevDate = c.date();
+            PrevDate = bars.getEndTime();
             double Y;
             double CandleWidth = Xdiff-2;//candletick width
             double CandleHeight;
-            if(c.open()<c.close()){
+            if(bars.getOpenPrice().isLessThan(bars.getClosePrice())){
                 g.setColor(Color.GREEN);
-                Y = (c.close()-min)*Ydiff;
-                CandleHeight = Y - (c.open()-min)*Ydiff;
+                Y = (bars.getClosePrice().doubleValue()-min)*Ydiff;
+                CandleHeight = Y - (bars.getOpenPrice().doubleValue()-min)*Ydiff;
                 g.fill(new Rectangle2D.Double(x+1,height - Y,CandleWidth,CandleHeight));
             }
-            if(c.open()>c.close()){
+            if(bars.getOpenPrice().isGreaterThan(bars.getClosePrice())){
                 g.setColor(Color.RED);
-                Y = (c.open()-min)*Ydiff;
-                CandleHeight = Y - (c.close()-min)*Ydiff;
+                Y = (bars.getOpenPrice().doubleValue()-min)*Ydiff;
+                CandleHeight = Y - (bars.getClosePrice().doubleValue()-min)*Ydiff;
                 g.fill(new Rectangle2D.Double(x+1,height - Y,CandleWidth,CandleHeight));
             }
             double axis = x+Xdiff/2;
-            double Ylow = (c.low()-min)*Ydiff;
-            double Yhigh = (c.high()-min)*Ydiff;
+            double Ylow = (bars.getLowPrice().doubleValue()-min)*Ydiff;
+            double Yhigh = (bars.getHighPrice().doubleValue()-min)*Ydiff;
             System.out.println("axis: " + axis + " Ylow: " + Ylow + " Yhigh: " + Yhigh);
             g.draw(new Line2D.Double(axis,height-Ylow,axis,height-Yhigh));
             x += Xdiff;
@@ -149,8 +148,10 @@ public class Graph extends JPanel {
                 Candlestick(g);
                 break;
         }
-        for(indicator i: indicators){
-            i.draw(g, stock, width, height);
+        if(!indicators.isEmpty()) {
+            for (indicator i : indicators) {
+                i.draw(g, stock, width, height);
+            }
         }
         g.dispose();
         repaint();
@@ -159,10 +160,18 @@ public class Graph extends JPanel {
         this.type = type;
         DrawGraph();
     }
-    public void setStock(Chart[] stock){
+    public void setStock(BarSeries stock){
         this.stock = stock;
         DrawGraph();
     }
+
+    public ArrayList<indicator> getIndicators() {
+        return indicators;
+    }
+    public void refresh(){
+        DrawGraph();
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

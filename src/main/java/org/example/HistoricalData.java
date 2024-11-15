@@ -4,7 +4,13 @@ import com.google.gson.*;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BarSeries;
+import org.ta4j.core.BaseBarSeries;
+
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -39,7 +45,7 @@ public class HistoricalData
             return response.body().string();
         }
     }
-    public Chart[] GetChart(String symbol, String timeframe, String start, String end ,String feed) {
+    public BarSeries GetChart(String symbol, String timeframe, String start, String end , String feed) {
         String jsonResponse = null;
         try {
             jsonResponse = GetData(symbol, timeframe, start, end ,feed);
@@ -50,8 +56,7 @@ public class HistoricalData
         JsonObject JsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
         JsonObject bars =  JsonObject.get("bars").getAsJsonObject();
         JsonArray charts = bars.get(symbol).getAsJsonArray();
-        Chart[] res = new Chart[charts.size()];
-        int i = 0;
+        BarSeries ret = new BaseBarSeries();
         for (JsonElement chart : charts) {
             JsonObject chartObj = chart.getAsJsonObject();
             double close = chartObj.get("c").getAsDouble();
@@ -60,10 +65,9 @@ public class HistoricalData
             double open = chartObj.get("o").getAsDouble();
             int volume = chartObj.get("v").getAsInt();
             String Date = chartObj.get("t").getAsString();
-            res[i] = new Chart(Date,open,high,low,close,volume);
-            i++;
+            ret.addBar(ZonedDateTime.parse(Date, DateTimeFormatter.ISO_ZONED_DATE_TIME), close, high, low, open, volume);
         }
-        return res;
+        return ret;
     }
     public Asset[] GetAsset() throws IOException {
         OkHttpClient client = new OkHttpClient();
@@ -72,8 +76,8 @@ public class HistoricalData
                 .url("https://paper-api.alpaca.markets/v2/assets?status=active&attributes=")
                 .get()
                 .addHeader("accept", "application/json")
-                .addHeader("APCA-API-KEY-ID", "PKRCBG5UH107R9QUT41V")
-                .addHeader("APCA-API-SECRET-KEY", "pK10CZABYWE5HTppdLFiqHcSev9qNUomW2CrY66g")
+                .addHeader("APCA-API-KEY-ID", API_KEY)
+                .addHeader("APCA-API-SECRET-KEY", API_SECRET)
                 .build();
 
         Response response = client.newCall(request).execute();
@@ -94,11 +98,41 @@ public class HistoricalData
             JsonObject a = asset.getAsJsonObject();
             String name = a.get("name").getAsString();
             String symbol = a.get("symbol").getAsString();
-            //System.out.println("name: "+name + " symbol: "+symbol);
             Asset NewAsset = new Asset(symbol,name);
             res[i++] = NewAsset;
 
         }
         return res;
+    }
+    public Quote GetQuote(String Symbol) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        String url = String.format("https://data.alpaca.markets/v2/stocks/quotes/latest?symbols=%s&feed=iex&currency=USD",Symbol);
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("APCA-API-KEY-ID", API_KEY)
+                .addHeader("APCA-API-SECRET-KEY", API_SECRET)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String jsonResponse;
+        try {
+            response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+        }finally {
+            jsonResponse = response.body().string();
+        }
+        JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
+        JsonObject aaplQuote = jsonObject.getAsJsonObject("quotes").getAsJsonObject("AAPL");
+
+        double ask = aaplQuote.get("ap").getAsDouble();
+        double bid = aaplQuote.get("bp").getAsDouble();
+
+        return new Quote(ask, bid);
     }
 }

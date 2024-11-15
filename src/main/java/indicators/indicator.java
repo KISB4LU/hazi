@@ -1,9 +1,11 @@
 package indicators;
 
-import org.example.Chart;
+import org.ta4j.core.BarSeries;
 
+import javax.swing.*;
 import java.awt.*;
 
 public abstract class indicator {
-    public abstract void draw(Graphics2D g, Chart chart[], int width, int height);
+    public abstract void draw(Graphics2D g, BarSeries stock, int width, int height);
+    public abstract JPanel getPanel();
 }
