@@ -1,4 +1,4 @@
-package window;
+package window.menubar;
 
 import javax.swing.*;
 import org.jdatepicker.impl.*;

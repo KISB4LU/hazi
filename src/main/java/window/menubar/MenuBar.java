@@ -1,9 +1,8 @@
-package window;
+package window.menubar;
 
 import org.jdatepicker.impl.JDatePickerImpl;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Calendar;
 
 

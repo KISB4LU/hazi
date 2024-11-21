@@ -24,4 +24,9 @@ public class BollingerBands extends indicator{
         return null;
     }
 
+    @Override
+    public void save(){
+
+    }
+
 }

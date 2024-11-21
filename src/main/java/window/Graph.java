@@ -30,7 +30,8 @@ public class Graph extends JPanel {
     private int height = 600;
     private GraphType type = GraphType.LINE;
     private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    BarSeries stock;
+    private BarSeries stock;
+    private String symbol;
     public Graph() {
         indicators = new ArrayList<>();
         indicators.add(new MovingAvrage(Color.BLUE,25));
@@ -148,11 +149,12 @@ public class Graph extends JPanel {
                 Candlestick(g);
                 break;
         }
-        if(!indicators.isEmpty()) {
-            for (indicator i : indicators) {
+
+        for (indicator i : indicators) {
+            if(i != null)
                 i.draw(g, stock, width, height);
-            }
         }
+
         g.dispose();
         repaint();
     }

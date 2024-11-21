@@ -18,6 +18,8 @@ public class MovingAvrage extends indicator {
     Color style;
     int len;
     private JPanel settings;
+    private JFormattedTextField length;
+    private JColorChooser cc;
 
     public MovingAvrage(Color color, int len) {
         style = color;
@@ -25,18 +27,20 @@ public class MovingAvrage extends indicator {
         initSettings();
     }
     public MovingAvrage() {
+        style = Color.YELLOW;
+        len = 9;
         initSettings();
     }
     private void initSettings(){
         settings = new JPanel();
 
-        JColorChooser cc =  new JColorChooser(style);
+        cc =  new JColorChooser(style);
 
         NumberFormat format = NumberFormat.getIntegerInstance();
         NumberFormatter numberFormatter = new NumberFormatter(format);
         numberFormatter.setMinimum(0);
         numberFormatter.setMaximum(Integer.MAX_VALUE);
-        JFormattedTextField length = new JFormattedTextField(numberFormatter);
+        length = new JFormattedTextField(numberFormatter);
         length.setColumns(10);
 
         settings.add(length);
@@ -79,6 +83,11 @@ public class MovingAvrage extends indicator {
     @Override
     public JPanel getPanel() {
         return settings;
+    }
+    @Override
+    public void save(){
+        len = Integer.parseInt(length.getText());
+        style = cc.getColor();
     }
     @Override
     public String toString() {

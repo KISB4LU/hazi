@@ -4,14 +4,12 @@ import com.google.gson.*;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeries;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class HistoricalData
@@ -128,10 +126,10 @@ public class HistoricalData
             jsonResponse = response.body().string();
         }
         JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
-        JsonObject aaplQuote = jsonObject.getAsJsonObject("quotes").getAsJsonObject("AAPL");
+        JsonObject symbolQuote = jsonObject.getAsJsonObject("quotes").getAsJsonObject(Symbol);
 
-        double ask = aaplQuote.get("ap").getAsDouble();
-        double bid = aaplQuote.get("bp").getAsDouble();
+        double ask = symbolQuote.get("ap").getAsDouble();
+        double bid = symbolQuote.get("bp").getAsDouble();
 
         return new Quote(ask, bid);
     }
