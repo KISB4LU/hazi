@@ -1,7 +1,234 @@
 [
   {
     "name": "test1",
-    "balance": 1000.0,
-    "password": "1234"
+    "balance": 1640.25,
+    "password": "1234",
+    "trades": [
+      {
+        "symbol": "AAPL",
+        "tradeDate": "2024-11-24",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 2.0,
+        "price": 225.99,
+        "Profit": 16.279999999999973,
+        "hd": {},
+        "tp": 233.0,
+        "sl": 222.0
+      },
+      {
+        "symbol": "AAPL",
+        "tradeDate": "2024-11-24",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 2.0,
+        "price": 225.99,
+        "Profit": 16.279999999999973,
+        "hd": {},
+        "tp": 233.0,
+        "sl": 222.0
+      },
+      {
+        "symbol": "TSLA",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 1.0,
+        "price": 326.0,
+        "Profit": 9.0,
+        "hd": {},
+        "tp": 350.0,
+        "sl": 330.0
+      },
+      {
+        "symbol": "NFLX",
+        "tradeDate": "2024-11-28",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 1.0,
+        "price": 877.31,
+        "Profit": -877.31,
+        "hd": {},
+        "tp": 2.0,
+        "sl": 2.0
+      },
+      {
+        "symbol": "AAPL",
+        "tradeDate": "2024-12-03",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 1.0,
+        "price": 219.0,
+        "Profit": 0.0,
+        "hd": {},
+        "tp": 250.0,
+        "sl": 200.0
+      },
+      {
+        "symbol": "TSLA",
+        "tradeDate": "2024-12-03",
+        "side": "BUY",
+        "Open": true,
+        "quantity": 1.0,
+        "price": 350.39,
+        "Profit": -0.339999999999975,
+        "hd": {},
+        "tp": 351.0,
+        "sl": 349.0
+      }
+    ],
+    "indicators": [
+      {
+        "type": "Ichimoku",
+        "properties": {
+          "ConversionLine": 9,
+          "BaseLine": 26,
+          "SpanBLen": 52,
+          "LaggingSpan": 26
+        }
+      }
+    ],
+    "watchlist": [
+      {
+        "symbol": "TSLA",
+        "ask": 350.39,
+        "bid": 350.05
+      },
+      {
+        "symbol": "AAPL",
+        "ask": 240.0,
+        "bid": 219.0
+      },
+      {
+        "symbol": "NFLX",
+        "ask": 909.34,
+        "bid": 897.61
+      }
+    ]
+  },
+  {
+    "name": "test2",
+    "balance": 10176.869999999999,
+    "password": "test2",
+    "trades": [
+      {
+        "symbol": "MSFT",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 5.0,
+        "price": 423.47,
+        "Profit": 42.649999999999864,
+        "hd": {},
+        "tp": 450.0,
+        "sl": 400.0
+      },
+      {
+        "symbol": "MSFT",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 5.0,
+        "price": 423.47,
+        "Profit": 42.649999999999864,
+        "hd": {},
+        "tp": 450.0,
+        "sl": 400.0
+      },
+      {
+        "symbol": "MSFT",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 5.0,
+        "price": 423.47,
+        "Profit": 42.649999999999864,
+        "hd": {},
+        "tp": 450.0,
+        "sl": 400.0
+      },
+      {
+        "symbol": "MSFT",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 5.0,
+        "price": 423.47,
+        "Profit": 39.499999999999886,
+        "hd": {},
+        "tp": 450.0,
+        "sl": 400.0
+      },
+      {
+        "symbol": "NVDA",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 1.0,
+        "price": 134.2,
+        "Profit": 4.27000000000001,
+        "hd": {},
+        "tp": 150.0,
+        "sl": 100.0
+      },
+      {
+        "symbol": "NVDA",
+        "tradeDate": "2024-11-27",
+        "side": "BUY",
+        "Open": false,
+        "quantity": 1.0,
+        "price": 134.2,
+        "Profit": 5.150000000000006,
+        "hd": {},
+        "tp": 150.0,
+        "sl": 100.0
+      }
+    ],
+    "indicators": [
+      {
+        "type": "ExpMovingAvrage",
+        "properties": {
+          "style": "#66FF00",
+          "len": 25
+        }
+      },
+      {
+        "type": "ParabolicSAR",
+        "properties": {
+          "Start": 0.02,
+          "Increment": 0.02,
+          "MaxValue": 0.2
+        }
+      },
+      {
+        "type": "MovingAvrage",
+        "properties": {
+          "style": "#33CC00",
+          "len": 25
+        }
+      }
+    ],
+    "watchlist": [
+      {
+        "symbol": "NVDA",
+        "ask": 139.0,
+        "bid": 137.1
+      },
+      {
+        "symbol": "META",
+        "ask": 592.92,
+        "bid": 592.67
+      },
+      {
+        "symbol": "MSFT",
+        "ask": 432.4,
+        "bid": 430.93
+      },
+      {
+        "symbol": "AAPL",
+        "ask": 240.0,
+        "bid": 219.0
+      }
+    ]
   }
 ]

@@ -11,13 +11,24 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-
+/**
+ * ez az osztály kommunikál az API-val
+ */
 public class HistoricalData
 {
     private String API_KEY = "PKRCBG5UH107R9QUT41V";
     private String API_SECRET = "pK10CZABYWE5HTppdLFiqHcSev9qNUomW2CrY66g";
 
-    public String GetData(String symbol, String timeframe, String start, String end ,String feed) throws IOException {
+    /**
+     * lekérdezi a részvényárfolyamot
+     * @param symbol szimbolum
+     * @param timeframe időkeret
+     * @param start dátum kezdete
+     * @param end dátum vége
+     * @return szoveges formátum
+     * @throws IOException
+     */
+    public String GetData(String symbol, String timeframe, String start, String end) throws IOException {
         OkHttpClient client = new OkHttpClient();
 
         //String url = String.format("https://data.alpaca.markets/v2/stocks/bars?symbols=%s&timeframe=%s&limit=%s&adjustment=raw&feed=%s&sort=asc", symbol, timeframe,limit, feed);
@@ -43,10 +54,19 @@ public class HistoricalData
             return response.body().string();
         }
     }
-    public BarSeries GetChart(String symbol, String timeframe, String start, String end , String feed) {
+
+    /**
+     * a paraméterek alapján barSeries osztályt ad vissza mivel tovább lehet dolgozni
+     * @param symbol szimbolum
+     * @param timeframe időkeret
+     * @param start dátum kezdete
+     * @param end dátum vége
+     * @return Barseries
+     */
+    public BarSeries GetChart(String symbol, String timeframe, String start, String end) {
         String jsonResponse = null;
         try {
-            jsonResponse = GetData(symbol, timeframe, start, end ,feed);
+            jsonResponse = GetData(symbol, timeframe, start, end);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,6 +87,12 @@ public class HistoricalData
         }
         return ret;
     }
+
+    /**
+     * lekérdezi az ősszes létező részvénz nevét és szimbolumát
+     * @return asset tömb
+     * @throws IOException
+     */
     public Asset[] GetAsset() throws IOException {
         OkHttpClient client = new OkHttpClient();
 
@@ -102,6 +128,13 @@ public class HistoricalData
         }
         return res;
     }
+
+    /**
+     * lekérdezi az adott részvény bid és ask árát
+     * @param Symbol szimbolum
+     * @return Quote
+     * @throws IOException
+     */
     public Quote GetQuote(String Symbol) throws IOException {
         OkHttpClient client = new OkHttpClient();
 

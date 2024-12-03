@@ -1,14 +1,16 @@
 package window;
 
-import indicators.MovingAvrage;
-import indicators.indicator;
+import indicators.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * az indikátorok hozzzáadásáért és törléséért felel
+ */
 public class IndicatorWindow extends JFrame {
-    private String[] Types = {"Simple Moving Avrage", "Bollinger Bands", "RSI"};
+    private String[] Types = {"Simple Moving Avrage"," Exponencial Moving Avrage", "Bollinger Bands", "Parabolic Sar", "ichimoku"};
     private indicator tmp = null;
     private DefaultListModel<String> listModel;
     private boolean addNewIndicator;
@@ -46,17 +48,27 @@ public class IndicatorWindow extends JFrame {
 
         apply.addActionListener(e -> {
             if(tmp != null) {
-                tmp.save();
-                listModel.addElement(tmp.toString());
-                indicators.add(tmp);
-                refresh.run();
-                addNewIndicator = true;
+                if(!addNewIndicator) {
+                    tmp.save();
+                    listModel.addElement(tmp.toString());
+                    indicators.add(tmp);
+                    refresh.run();
+                    addNewIndicator = true;
+                }else{
+                    listModel.removeElement(tmp.toString());
+                    tmp.save();
+                    listModel.addElement(tmp.toString());
+                }
+
+                tmp.getPanel().setVisible(false);
+                tmp = null;
             }
         });
 
         delete.addActionListener(e -> {
             if(tmp != null) {
                 addNewIndicator = true;
+                tmp.getPanel().setVisible(false);
                 indicators.remove(tmp);
                 listModel.removeElement(tmp.toString());
                 tmp = null;
@@ -91,7 +103,7 @@ public class IndicatorWindow extends JFrame {
                 //indicators.add(tmp);
                 //System.out.println(ex.getMessage());
             }
-
+        //curr.clearSelection();
         });
 
         types.addListSelectionListener(e -> {
@@ -110,8 +122,36 @@ public class IndicatorWindow extends JFrame {
                     }
                     break;
                 case 1:
+                    if(addNewIndicator) {
+                        tmp = new ExpMovingAvrage();
+                        rightPanel.add(tmp.getPanel());
+                        tmp.getPanel().setVisible(true);
+                        addNewIndicator = false;
+                    }
                     break;
                 case 2:
+                    if(addNewIndicator) {
+                        tmp = new BollingerBands();
+                        rightPanel.add(tmp.getPanel());
+                        tmp.getPanel().setVisible(true);
+                        addNewIndicator = false;
+                    }
+                    break;
+                case 3:
+                    if(addNewIndicator) {
+                        tmp = new ParabolicSAR();
+                        rightPanel.add(tmp.getPanel());
+                        tmp.getPanel().setVisible(true);
+                        addNewIndicator = false;
+                    }
+                    break;
+                case 4:
+                    if(addNewIndicator) {
+                        tmp = new Ichimoku();
+                        rightPanel.add(tmp.getPanel());
+                        tmp.getPanel().setVisible(true);
+                        addNewIndicator = false;
+                    }
                     break;
             }
         });

@@ -4,35 +4,31 @@ import com.google.gson.annotations.Expose;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.EMAIndicator;
-import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.Num;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.text.NumberFormat;
 
-public class MovingAvrage extends indicator {
+public class ExpMovingAvrage extends indicator {
     @Expose
     public Color style;
     @Expose
     public int len;
     private transient JPanel settings;
     private transient JFormattedTextField length;
-    private transient JColorChooser cc; //transient
+    private transient JColorChooser cc;
     /**
-     * Egyszerü mozgó átlag konstruktora ami beállitja az alapértelmezett paramétereket
+     * Exponenciális mozgó átlag konstruktora ami beállitja az alapértelmezett paramétereket
      * és konfigurálja a settings panelt
      */
-    public MovingAvrage() {
+    public ExpMovingAvrage() {
+        settings = new JPanel();
         style = Color.YELLOW;
         len = 9;
-
-        settings = new JPanel();
-
         cc =  new JColorChooser(style);
 
         NumberFormat format = NumberFormat.getIntegerInstance();
@@ -56,9 +52,9 @@ public class MovingAvrage extends indicator {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(stock);
 
 
-        SMAIndicator sma = new SMAIndicator(closePrice, len);
+        EMAIndicator ema = new EMAIndicator(closePrice, len);
         Num min= stock.getFirstBar().getClosePrice(),
-            max = stock.getFirstBar().getClosePrice();
+                max = stock.getFirstBar().getClosePrice();
         for(Bar bar : stock.getBarData()) {
             if(min.isGreaterThan(bar.getClosePrice())) min = bar.getClosePrice();
             if(max.isLessThan(bar.getClosePrice())) max = bar.getClosePrice();
@@ -71,10 +67,10 @@ public class MovingAvrage extends indicator {
         double x1 = Xdiff;
         System.out.println("min: "+min + " max: "+max);
         for (int i = 0; i < stock.getBarCount()-1; i++) {
-            double y0 = height- sma.getValue(i).minus(min).doubleValue()*Ydiff;
-            double y1 = height- sma.getValue(i+1).minus(min).doubleValue()*Ydiff;
+            double y0 = height- ema.getValue(i).minus(min).doubleValue()*Ydiff;
+            double y1 = height- ema.getValue(i+1).minus(min).doubleValue()*Ydiff;
             g.draw(new Line2D.Double(x0, y0, x1, y1));
-            System.out.println("ma["+i+"]:"+sma.getValue(i)+" x0: "+x0+" y0: "+y0+" x1: "+x1+" y1: "+y1);
+            System.out.println("ma["+i+"]:"+ema.getValue(i)+" x0: "+x0+" y0: "+y0+" x1: "+x1+" y1: "+y1);
             x0 += Xdiff;
             x1 += Xdiff;
         }
@@ -90,7 +86,7 @@ public class MovingAvrage extends indicator {
     }
     @Override
     public String toString() {
-        return "Moving Avrage (" + len + ")";
+        return "Exponencial Moving Avrage (" + len + ")";
     }
 
 }

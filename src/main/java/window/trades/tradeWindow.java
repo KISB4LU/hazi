@@ -34,9 +34,9 @@ public class tradeWindow extends JPanel {
         quantity = new JFormattedTextField(new DecimalFormat("####.##"));
         sl = new JFormattedTextField(new DecimalFormat("####.##"));
         tp = new JFormattedTextField(new DecimalFormat("####.##"));
-        quantity.setColumns(20);
-        sl.setColumns(10);
-        tp.setColumns(10);
+        quantity.setColumns(10);
+        sl.setColumns(5);
+        tp.setColumns(5);
         JPanel sltp = new JPanel();
         sltp.add(sl);
         sltp.add(tp);
@@ -69,10 +69,15 @@ public class tradeWindow extends JPanel {
             double StopLoss = Double.parseDouble(sl.getText());
             double TakeProfit = Double.parseDouble(tp.getText());
             LocalDate time = LocalDate.now();
-            double price = q.Bid();
-            if(user.getBalance() >= price*qty) {
-                trade Trade = new trade(user, symbol, time, Side.BUY, qty, price, TakeProfit, StopLoss);
-                user.addTrade(Trade);
+            double price = q.Ask();
+            if(this.user.getBalance() >= price*qty) {
+                trade Trade;
+                if(StopLoss < price && TakeProfit > price)
+                    Trade = new trade(this.user, symbol, time, Side.BUY, qty, price, TakeProfit, StopLoss);
+                else {
+                    error.setText("invalid tp or sl");
+                    error.setVisible(true);
+                }
             } else{
                 error.setText("Insufficient funds");
                 error.setVisible(true);
@@ -90,10 +95,16 @@ public class tradeWindow extends JPanel {
             double StopLoss = Double.parseDouble(sl.getText());
             double TakeProfit = Double.parseDouble(tp.getText());
             LocalDate time = LocalDate.now();
-            double price = q.Ask();
-            if(user.getBalance() >= price*qty) {
-                trade Trade = new trade(user, symbol, time, Side.SELL, qty, price, TakeProfit, StopLoss);
-                user.addTrade(Trade);
+            double price = q.Bid();
+            if(this.user.getBalance() >= price*qty) {
+                trade Trade;
+                if(StopLoss > price && TakeProfit < price)
+                    Trade = new trade(this.user, symbol, time, Side.SELL, qty, price, TakeProfit, StopLoss);
+                else {
+                    error.setText("invalid tp or sl");
+                    error.setVisible(true);
+                }
+
             } else{
                 error.setText("Insufficient funds");
                 error.setVisible(true);
@@ -103,5 +114,9 @@ public class tradeWindow extends JPanel {
     public void setSymbol(String symbol) {
         this.symbol = symbol;
         label.setText(symbol);
+    }
+    public void setUser(User user){
+        this.user = user;
+        System.out.println(user);
     }
 }

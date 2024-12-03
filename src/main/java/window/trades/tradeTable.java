@@ -5,9 +5,13 @@ import java.util.List;
 
 public class tradeTable extends AbstractTableModel {
     private List<trade> trades;
-    private String[] columnNames = {"Date","Symbol" , "Amount", "Profit"};
+    private final String[] columnNames = {"Date","Symbol" , "Amount", "Profit","Status"};
     public tradeTable(List<trade> trades) {
         this.trades = trades;
+    }
+
+    public trade getElementAt(int index) {
+        return trades.get(index);
     }
     @Override
     public int getRowCount() {
@@ -25,7 +29,15 @@ public class tradeTable extends AbstractTableModel {
             case 1: return trade.getSymbol();
             case 2: return trade.getQuantity();
             case 3: return trade.getProfit();
+            case 4:
+                if(trade.isOpen())
+                    return "Open";
+                else return "Closed";
             default: return null;
         }
+    }
+    @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
     }
 }

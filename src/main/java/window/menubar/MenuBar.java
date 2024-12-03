@@ -1,12 +1,16 @@
 package window.menubar;
 
 import org.jdatepicker.impl.JDatePickerImpl;
+import window.login.User;
 
 import javax.swing.*;
 import java.util.Calendar;
 
-
+/**
+ * menu
+ */
 public class MenuBar extends JPanel {
+    private Profile profile;
     private JButton line;
     private JButton candle;
     private JButton indicators;
@@ -16,6 +20,7 @@ public class MenuBar extends JPanel {
     public MenuBar() {
         String TimeFrame[] = {"1Min", "5Min", "15Min", "30Min", "1Hour","2Hour", "4hour", "1Day", "1Week"};
 
+        profile = new Profile();
         line = new JButton("Line");
         candle = new JButton("Candle");
         indicators = new JButton("Indicators");
@@ -25,12 +30,16 @@ public class MenuBar extends JPanel {
         start = new DatePicker("start: ", Start);
         end = new DatePicker("end: ",Calendar.getInstance());
 
+        add(profile);
         add(line);
         add(candle);
         add(indicators);
         add(start);
         add(end);
         add(TimeFrameBox);
+    }
+    public void updateProfile(){
+        profile.update();
     }
     public JButton getLine() {
         return line;
@@ -52,5 +61,9 @@ public class MenuBar extends JPanel {
     }
     public JComboBox getTimeFrameBox() {
         return TimeFrameBox;
+    }
+
+    public void setProfile(User user) {
+        profile.setUser(user);
     }
 }

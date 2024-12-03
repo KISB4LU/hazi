@@ -6,6 +6,9 @@ import org.jdatepicker.impl.*;
 import java.util.Calendar;
 import java.util.Properties;
 
+/**
+ * dátumválasztó
+ */
 public class DatePicker extends JPanel {
     private JDatePickerImpl datePicker;
     public DatePicker(String title, Calendar Date) {

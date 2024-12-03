@@ -1,5 +1,8 @@
 package org.example;
 
+/**
+ * az osztály célja hogy eltárolja az ask és bid árát
+ */
 public class Quote {
     private double ask;
     private double bid;

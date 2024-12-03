@@ -1,19 +1,29 @@
 package window.watchlist;
 
+import com.google.gson.annotations.Expose;
 import org.example.HistoricalData;
 import org.example.Quote;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
+/**
+ * watclist lista elem
+ */
 public class Element {
     private HistoricalData hd;
+    @Expose
     private String symbol;
+    @Expose
     private double ask;
+    @Expose
     private double bid;
+
     private Color  askColor;
     private Color  bidColor;
     private  Quote quote;
+    private JButton delete;
     public Element(String symbol) {
         this.symbol = symbol;
         askColor = Color.GREEN;
@@ -26,6 +36,7 @@ public class Element {
         }
         ask = quote.Ask();
         bid = quote.Bid();
+        delete = new JButton("X");
     };
     public void update(){
         try {
@@ -64,5 +75,16 @@ public class Element {
     }
     public Color getBidColor() {
         return bidColor;
+    }
+    public JButton getDelete() {
+        return delete;
+    }
+    public void setHd(HistoricalData hd) {
+        this.hd = hd;
+    }
+
+    @Override
+    public String toString() {
+        return symbol + ": ask: "+ask+", bid: "+bid;
     }
 }

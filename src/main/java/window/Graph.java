@@ -20,6 +20,10 @@ enum GraphType{
     LINE,
     CANDLE
 }
+
+/**
+ * grafikon ami kiajzolja a részvényt és a beállitott indikátorokat
+ */
 public class Graph extends JPanel {
     /*private BufferedImage image;
     Chart(){
@@ -34,14 +38,16 @@ public class Graph extends JPanel {
     private String symbol;
     public Graph() {
         indicators = new ArrayList<>();
-        indicators.add(new MovingAvrage(Color.BLUE,25));
-        indicators.add(new MovingAvrage(Color.RED,50));
-        indicators.add(new MovingAvrage(Color.GREEN,100));
         HistoricalData hd = new HistoricalData();
-        stock = hd.GetChart("AAPL","5Min","2024-01-01","2024-01-02","sip");
+        stock = hd.GetChart("AAPL","5Min","2024-01-01","2024-01-02");
 
         DrawGraph();
     }
+
+    /**
+     * a részvények záróára alpáj vonalgrafikont rajzol
+     * @param g
+     */
     private void LineGraph(Graphics2D g){
         //g.drawLine(0,10,50,50);
         g.setColor(Color.BLUE);
@@ -75,9 +81,14 @@ public class Graph extends JPanel {
             g.draw(new Line2D.Double(x0,y0,x1,y1));
             x0 += Xdiff;
             x1 += Xdiff;
-                System.out.println(i+". Date: " + stock.getBar(i).getEndTime() + " close: " + stock.getBar(i).getClosePrice());
+               // System.out.println(i+". Date: " + stock.getBar(i).getEndTime() + " close: " + stock.getBar(i).getClosePrice());
         }
     }
+
+    /**
+     *  japán gyertya alakzatot ir ki
+     * @param g
+     */
     private void Candlestick (Graphics2D g){
         /*HistoricalData hd = new HistoricalData();
 
@@ -116,13 +127,13 @@ public class Graph extends JPanel {
             double CandleWidth = Xdiff-2;//candletick width
             double CandleHeight;
             if(bars.getOpenPrice().isLessThan(bars.getClosePrice())){
-                g.setColor(Color.GREEN);
+                g.setColor(Color.RED);//javitva
                 Y = (bars.getClosePrice().doubleValue()-min)*Ydiff;
                 CandleHeight = Y - (bars.getOpenPrice().doubleValue()-min)*Ydiff;
                 g.fill(new Rectangle2D.Double(x+1,height - Y,CandleWidth,CandleHeight));
             }
             if(bars.getOpenPrice().isGreaterThan(bars.getClosePrice())){
-                g.setColor(Color.RED);
+                g.setColor(Color.GREEN);//javitva
                 Y = (bars.getOpenPrice().doubleValue()-min)*Ydiff;
                 CandleHeight = Y - (bars.getClosePrice().doubleValue()-min)*Ydiff;
                 g.fill(new Rectangle2D.Double(x+1,height - Y,CandleWidth,CandleHeight));
@@ -130,13 +141,20 @@ public class Graph extends JPanel {
             double axis = x+Xdiff/2;
             double Ylow = (bars.getLowPrice().doubleValue()-min)*Ydiff;
             double Yhigh = (bars.getHighPrice().doubleValue()-min)*Ydiff;
-            System.out.println("axis: " + axis + " Ylow: " + Ylow + " Yhigh: " + Yhigh);
+            // System.out.println("axis: " + axis + " Ylow: " + Ylow + " Yhigh: " + Yhigh);
             g.draw(new Line2D.Double(axis,height-Ylow,axis,height-Yhigh));
             x += Xdiff;
         }
     }
 
+    /**
+     * ujrarajzolja a grafikont
+     */
     private void DrawGraph() {
+        //this.width = getWidth();
+        //this.height = getHeight();
+        //if(width != 0 && height != 0)
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         g.setColor(Color.DARK_GRAY);
         g.fillRect(0, 0, width, height);
@@ -150,9 +168,10 @@ public class Graph extends JPanel {
                 break;
         }
 
-        for (indicator i : indicators) {
-            if(i != null)
-                i.draw(g, stock, width, height);
+        for (int i = 0; i<indicators.size(); i++) {
+            indicator I = indicators.get(i);
+            I.draw(g,stock,width,height);
+            g.drawString(I.toString(), 20, (i+1)*20);
         }
 
         g.dispose();
@@ -170,6 +189,12 @@ public class Graph extends JPanel {
     public ArrayList<indicator> getIndicators() {
         return indicators;
     }
+
+    public void setIndicators(ArrayList<indicator> indicators) {
+        this.indicators = indicators;
+        DrawGraph();
+    }
+
     public void refresh(){
         DrawGraph();
     }
@@ -178,6 +203,9 @@ public class Graph extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(image, 0, 0, null);
+        System.out.println("width: "+getWidth()+", height: "+getHeight());
+        this.width = getWidth();
+        this.height = getHeight();
+        g2d.drawImage(image, 0, 0,getWidth(), getHeight(), null);
     }
 }
